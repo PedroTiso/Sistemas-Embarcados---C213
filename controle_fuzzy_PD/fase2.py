@@ -1,26 +1,20 @@
 import math
 
 # ============================================================
-# fase2.py - Controle de temperatura com controlador Fuzzy PD
+#Controle de temperatura com controlador Fuzzy PD
 # ============================================================
 #
-# Esta fase estende a "fase1.py":
-#  - modelo térmico discreto do data center
-#  - controlador fuzzy PD (entradas: erro e derivada do erro)
-#  - simulação de 24h com perfis de Text e Qest
-#  - cálculo de métricas básicas de desempenho
-#
-# O objetivo é manter a temperatura em torno de 22 °C (setpoint)
-# atuando sobre a variável de controle PCRAC (% da capacidade do ar-condicionado).
-# ------------------------------------------------------------
+#Esta fase estende a fase1:
+# - controlador fuzzy PD (entradas: erro e derivada do erro)
+# - simulação de 24h com perfis de Text e Qest
+# - cálculo de métricas básicas de desempenho
 
+#O objetivo é manter a temperatura em torno de 22 °C (setpoint)
+#atuando sobre a variável de controle PCRAC (% da capacidade do ar-condicionado).
 
-# ---------------------------
-# Funções de pertinência
-# ---------------------------
-
+#Funções de pertinência
 def trimf(x, a, b, c):
-    """Função de pertinência triangular."""
+    """Função de pertinência triangular"""
     if x <= a or x >= c:
         return 0.0
     if x == b:
@@ -33,7 +27,7 @@ def trimf(x, a, b, c):
 
 
 def trapmf(x, a, b, c, d):
-    """Função de pertinência trapezoidal."""
+    """Função de pertinência trapezoidal"""
     if x <= a or x >= d:
         return 0.0
     if b <= x <= c:
@@ -44,12 +38,9 @@ def trapmf(x, a, b, c, d):
         return (d - x) / float(d - c)
     return 0.0
 
+#Universo e conjuntos fuzzy
 
-# ---------------------------
-# Universo e conjuntos fuzzy
-# ---------------------------
-
-# Universo das variáveis (apenas para referência/documentação)
+#Universo das variáveis
 RANGES = {
     "e": (-15.0, 15.0),        # erro (°C)
     "de": (-10.0, 10.0),       # derivada do erro (°C/min)
@@ -58,15 +49,15 @@ RANGES = {
     "PCRAC": (0.0, 100.0)      # saída: potência do ar-condicionado (%)
 }
 
-# Termos linguísticos para erro e derivada:
+#Termos linguísticos para erro e derivada:
 E_TERMS = ["NG", "NP", "ZO", "PP", "PG"]  # Negativo Grande / Pequeno / Zero / Positivo Pequeno / Grande
 
-# Termos linguísticos para a saída PCRAC:
+#Termos linguísticos para a saída PCRAC:
 OUT_TERMS = ["MUITO_BAIXA", "BAIXA", "MEDIA", "ALTA", "MUITO_ALTA"]
 
 
 def fuzzify_e(e):
-    """Calcula μ para cada termo linguístico do erro e."""
+    """Calcula μ para cada termo linguístico do erro e"""
     return {
         "NG": trimf(e, -15.0, -15.0, -5.0),
         "NP": trimf(e, -10.0, -5.0, 0.0),
@@ -77,7 +68,7 @@ def fuzzify_e(e):
 
 
 def fuzzify_de(de):
-    """Calcula μ para cada termo linguístico da derivada do erro de."""
+    """Calcula μ para cada termo linguístico da derivada do erro de"""
     return {
         "NG": trimf(de, -10.0, -10.0, -4.0),
         "NP": trimf(de, -6.0, -3.0, 0.0),
@@ -88,7 +79,7 @@ def fuzzify_de(de):
 
 
 def mu_out(term, p):
-    """Função de pertinência dos termos de saída (PCRAC)."""
+    """Função de pertinência dos termos de saída (PCRAC)"""
     if term == "MUITO_BAIXA":
         return trapmf(p, 0.0, 0.0, 10.0, 25.0)
     if term == "BAIXA":
@@ -102,13 +93,7 @@ def mu_out(term, p):
     return 0.0
 
 
-# ---------------------------
-# Base de regras PD (e, de)
-# ---------------------------
-#
-# Matriz 5x5: linhas = e (NG..PG), colunas = de (NG..PG)
-# Cada célula indica o termo linguístico da saída PCRAC.
-
+#Tabela de regras
 RULE_TABLE = [
     # de:      NG           NP          ZO          PP          PG
     ["MUITO_BAIXA", "MUITO_BAIXA", "BAIXA",      "MEDIA",      "ALTA"],        # e = NG (sala muito fria)
@@ -118,7 +103,7 @@ RULE_TABLE = [
     ["MEDIA",       "ALTA",        "ALTA",       "MUITO_ALTA", "MUITO_ALTA"],  # e = PG (sala muito quente)
 ]
 
-DE_TERMS = E_TERMS  # mesma ordenação
+DE_TERMS = E_TERMS 
 
 
 def controlador_fuzzy_pd(e, de, passos_saida=101):
@@ -127,11 +112,11 @@ def controlador_fuzzy_pd(e, de, passos_saida=101):
       entradas: erro (e) e derivada do erro (de)
       saída   : PCRAC (%) via defuzzificação (método do centroide)
     """
-    # Fuzzificação
+    #Fuzzificação
     mu_e = fuzzify_e(e)
     mu_de = fuzzify_de(de)
 
-    # Agregação das regras (Mamdani - max/min)
+    #Agregação das regras (Mamdani - max/min)
     out_agg = {term: 0.0 for term in OUT_TERMS}
 
     for i, e_term in enumerate(E_TERMS):
@@ -143,7 +128,7 @@ def controlador_fuzzy_pd(e, de, passos_saida=101):
             if w > out_agg[out_term]:
                 out_agg[out_term] = w
 
-    # Defuzzificação: centroide no universo [0, 100] %
+    #Defuzzificação: centroide no universo [0, 100] %
     num = 0.0
     den = 0.0
     p_min, p_max = RANGES["PCRAC"]
@@ -151,7 +136,7 @@ def controlador_fuzzy_pd(e, de, passos_saida=101):
 
     for k in range(passos_saida):
         p = p_min + k * step
-        # μ agregado na saída: max(min(μ_out, μ_regra))
+        #μ agregado na saída: max(min(μ_out, μ_regra))
         mu_p = 0.0
         for term, alpha in out_agg.items():
             if alpha <= 0.0:
@@ -162,51 +147,48 @@ def controlador_fuzzy_pd(e, de, passos_saida=101):
         den += mu_p
 
     if den == 0.0:
-        return 50.0  # neutro se não houver ativação
+        return 50.0  #neutro se não houver ativação
     return num / den
 
 
-# ---------------------------
-# Modelo térmico discreto
-# ---------------------------
-
+#Modelo térmico discreto
 def perfil_temperatura_externa(minuto):
     """
-    Perfil simples de temperatura externa ao longo de 24h.
-    Retorna Text em °C.
+    Perfil simples de temperatura externa ao longo de 24h
+    Retorna Text em °C
     """
     hora = (minuto / 60.0) % 24.0
 
     if 0 <= hora < 6:
         return 20.0
     elif 6 <= hora < 12:
-        # manhã esquentando
+        #manhã esquentando
         return 20.0 + (hora - 6.0) * 2.0   # de 20 -> 32
     elif 12 <= hora < 18:
-        # tarde quente
+        #tarde quente
         return 32.0
     elif 18 <= hora < 22:
-        # começo da noite esfriando
+        #começo da noite esfriando
         return 32.0 - (hora - 18.0) * 3.0  # 32 -> 20
     else:
-        # madrugada mais fresca
+        #madrugada mais fresca
         return 20.0
 
 
 def perfil_carga_termica(minuto):
     """
-    Perfil simplificado de carga térmica Qest (%) ao longo do dia.
+    Perfil simplificado de carga térmica Qest (%) ao longo do dia
     """
     hora = (minuto / 60.0) % 24.0
 
     if 0 <= hora < 8:
-        return 20.0   # madrugada
+        return 20.0   #madrugada
     elif 8 <= hora < 18:
-        return 80.0   # horário de pico de uso
+        return 80.0   #horário de pico de uso
     elif 18 <= hora < 22:
-        return 50.0   # início da noite
+        return 50.0   #início da noite
     else:
-        return 30.0   # noite mais tranquila
+        return 30.0   #noite mais tranquila
 
 
 def proxima_temperatura(T_atual, PCRAC, Text, Qest):
@@ -221,20 +203,16 @@ def proxima_temperatura(T_atual, PCRAC, Text, Qest):
         + 0.02 * Text
         + 3.5
     )
-
-
-# ---------------------------
+    
 # Simulação completa
-# ---------------------------
-
 def simular_24h(
     T_inicial=22.0,
     setpoint=22.0,
     minutos=24 * 60
 ):
     """
-    Simula 24h de operação do controlador fuzzy PD.
-    Retorna um dicionário com as métricas e o histórico.
+    Simula 24h de operação do controlador fuzzy PD
+    Retorna um dicionário com as métricas e o histórico
     """
     T = T_inicial
     e_prev = 0.0
@@ -257,7 +235,7 @@ def simular_24h(
 
         T_prox = proxima_temperatura(T, PCRAC, Text, Qest)
 
-        # Atualiza métricas
+        #Atualiza métricas
         soma_erro2 += (T - setpoint) ** 2
         if 20.0 <= T <= 24.0:
             tempo_faixa_conforto += 1
@@ -278,7 +256,7 @@ def simular_24h(
         T = T_prox
         e_prev = e
 
-        # Logs de hora em hora para não poluir a saída
+        #Logs de hora em hora para não poluir a saída
         if minuto % 60 == 0:
             hora = minuto // 60
             print(
