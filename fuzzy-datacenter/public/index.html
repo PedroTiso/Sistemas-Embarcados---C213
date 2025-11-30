@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle Fuzzy MISO - Data Center</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js para todos os gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Controle Fuzzy MISO - Sistema de Refrigeração do Data Center</h1>
+    <p>
+      Interface para monitoramento e controle do controlador PD Fuzzy
+      (Erro, ΔErro, Text, Qest → PCRAC).
+    </p>
+
+    <div class="mqtt-dashboard-link">
+      <button
+        class="btn-mqtt"
+        onclick="window.open('http://localhost:1880/ui', '_blank')">
+        Abrir Dashboard MQTT (Node-RED)
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Painel de Controle -->
+    <section id="control-panel" class="card">
+      <h2>Painel de Controle</h2>
+      <div class="control-actions">
+        <button id="btnCalc">Executar Cálculo Fuzzy</button>
+        <button id="btnClear">Limpar / Resetar</button>
+      </div>
+      <div class="params">
+        <label>
+          Setpoint (Tset):
+          <input type="number" id="tset" value="22" step="0.1" />
+          <span class="unit">°C</span>
+        </label>
+        <small>Para referência visual. O controlador usa Erro e ΔErro diretamente.</small>
+      </div>
+    </section>
+
+    <div class="layout-2col">
+      <!-- Painel de Entradas -->
+      <section id="input-panel" class="card">
+        <h2>Painel de Entradas</h2>
+        <form id="input-form">
+          <div class="field-group">
+            <label for="e">Erro (e = T - Tset)</label>
+            <input type="number" id="e" step="0.1" value="0" />
+            <small>Faixa típica do projeto (ex.: -15 a 20).</small>
+          </div>
+          <div class="field-group">
+            <label for="de">ΔErro (de)</label>
+            <input type="number" id="de" step="0.1" value="0" />
+            <small>Variação do erro entre passos.</small>
+          </div>
+          <div class="field-group">
+            <label for="Text">Temperatura Externa (Text)</label>
+            <input type="number" id="Text" step="0.1" value="25" />
+            <small>Faixa típica: 10 a 35 °C.</small>
+          </div>
+          <div class="field-group">
+            <label for="Qest">Carga Térmica (Qest)</label>
+            <input type="number" id="Qest" step="1" value="40" />
+            <small>Faixa: 0 a 100 %.</small>
+          </div>
+        </form>
+        <div id="input-error" class="error"></div>
+      </section>
+
+      <!-- Painel de Saída -->
+      <section id="output-panel" class="card">
+        <h2>Painel de Saída</h2>
+        <div class="output-values">
+          <span>PCRAC calculado:</span>
+          <strong id="pcrac-value">--</strong><span class="unit">%</span>
+        </div>
+        <div class="gauge-wrapper">
+          <canvas id="pcracGauge"></canvas>
+        </div>
+        <small>Indicador numérico e gráfico da potência CRAC.</small>
+      </section>
+    </div>
+
+    <!-- Funções de Pertinência -->
+    <section id="membership-section" class="card">
+      <h2>Funções de Pertinência</h2>
+      <div class="layout-2col membership-grid">
+        <div class="mf-column">
+          <h3>Entradas (Erro, ΔErro, Text, Qest)</h3>
+          <div class="canvas-row">
+            <canvas id="mf-e"></canvas>
+            <canvas id="mf-de"></canvas>
+          </div>
+          <div class="canvas-row">
+            <canvas id="mf-text"></canvas>
+            <canvas id="mf-qest"></canvas>
+          </div>
+        </div>
+        <div class="mf-column">
+          <h3>Saída (PCRAC)</h3>
+          <canvas id="mf-pcrac" class="large-canvas"></canvas>
+          <small>Linhas verticais indicam o ponto de operação atual.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Processo de Inferência -->
+    <section id="inference-section" class="card">
+      <h2>Processo de Inferência</h2>
+      <div class="layout-2col">
+        <div>
+          <h3>Ativação de Regras</h3>
+          <div class="table-wrapper">
+            <table id="rules-table">
+              <thead>
+                <tr>
+                  <th>Descrição da Regra</th>
+                  <th>Saída</th>
+                  <th>Força</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>Agregação e Defuzzificação</h3>
+          <canvas id="aggregationChart" class="large-canvas"></canvas>
+          <small>Barras mostram a força agregada de cada termo de saída fuzzy.</small>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Projeto Fuzzy MISO - Data Center • Interface Web (Entradas, Saída, Funções de Pertinência e Processo de Inferência).</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

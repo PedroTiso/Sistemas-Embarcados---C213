@@ -1,0 +1,200 @@
+/* ====== TEMA GLOBAL ====== */
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #0f172a; /* Slate-900 */
+    color: #f1f5f9; /* Slate-100 */
+    margin: 0;
+    padding: 0;
+}
+
+/* ====== CARDS ====== */
+.card {
+    background: #1e293b; /* Slate-800 */
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px auto;
+    max-width: 1200px;
+    box-shadow: 0px 0px 20px #00000033;
+}
+
+.card h2, 
+.card h3 {
+    margin-top: 0;
+    color: #fff;
+}
+
+/* ====== INPUTS E BOTÕES ====== */
+input, select {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+button {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: 0.2s ease-in-out;
+}
+
+button:hover {
+    background: #2563eb;
+}
+
+/* ====== CANVAS (TODOS OS GRÁFICOS) ====== */
+canvas {
+    width: 100%;
+    max-width: 100%;
+    height: 240px !important;    /* altura padrão */
+    background: #020617;
+    border-radius: 12px;
+}
+
+/* Gráficos maiores (Gauge, agregação) */
+.large-canvas {
+    height: 320px !important;
+}
+
+/* ====== GRID PRINCIPAL DAS FUNÇÕES DE PERTINÊNCIA ====== */
+.membership-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    margin-top: 20px;
+}
+
+/* colunas (Entradas e Saída) */
+.mf-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+/* cada linha de gráfico */
+.canvas-row {
+    width: 100%;
+}
+
+.canvas-row canvas {
+    height: 240px !important;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 900px) {
+    .membership-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ====== TABELAS ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #334155;
+}
+
+td {
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+}
+
+/* ====== GAUGE ====== */
+#gaugeValueText {
+    text-align: center;
+    font-size: 22px;
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+/* ====== TITULOS ====== */
+.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* ====== PATCH PARA CHART.JS ====== */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 260px;
+}
+
+/* ============================= */
+/* AJUSTE FINO DOS GRÁFICOS FUZZY */
+/* ============================= */
+
+/* Deixa TODOS os gráficos de pertinência com mesma largura
+   e centralizados dentro da card */
+#mf-e,
+#mf-de,
+#mf-text,
+#mf-qest,
+#mf-pcrac {
+  display: block;
+  max-width: 900px;        /* largura visual parecida entre todos */
+  margin: 12px auto;       /* centraliza e dá respiro */
+}
+
+/* Altura uniforme pros gráficos dessa seção */
+#mf-e,
+#mf-de,
+#mf-text,
+#mf-qest {
+  height: 230px !important;
+}
+
+#mf-pcrac {
+  height: 260px !important;  
+}
+
+#membership-section,
+#mf-section,
+#funcoes-pertinencia {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ====== LINK / BOTÃO DO DASHBOARD MQTT ====== */
+
+.mqtt-dashboard-link {
+    margin-top: 10px;
+}
+
+/* pode ser usado tanto em <button> quanto em <a> */
+.btn-mqtt {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background-color: #3b82f6;  /* azul */
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out, transform 0.1s;
+}
+
+.btn-mqtt:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
