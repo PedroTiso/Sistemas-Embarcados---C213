@@ -47,7 +47,8 @@ O sistema integra lógica de controle, backend em Node.js e visualização em te
 
 ---
 
-👨‍💻 Autores
+## 👨‍💻 Autores
+
 Gabriel Lopes Silva – Lógica Fuzzy e inferência
 
 Lucas Caetano Reis – Integração MQTT e backend
