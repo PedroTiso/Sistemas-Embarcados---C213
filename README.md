@@ -18,12 +18,11 @@ O sistema integra lógica de controle, backend em Node.js e visualização em te
 ---
 
 ## 🧠 Principais Funcionalidades
-- Controle dinâmico da potência do CRAC utilizando lógica Fuzzy PD  
-- Cálculo do erro térmico e da variação do erro  
-- Integração de variáveis externas, como temperatura externa e carga térmica  
-- API REST em Node.js para execução do controlador e validação das entradas do sistema  
-- Publicação de dados via MQTT  
-- Dashboard em tempo real com Node-RED para monitoramento do sistema  
+- Backend em Node.js responsável pela execução do controlador Fuzzy PD e organização da lógica de negócio
+- API REST para validação de entradas, execução do controle e retorno dos resultados
+- Dashboard em tempo real com Node-RED para monitoramento do comportamento térmico e atuação do CRAC
+- Comunicação assíncrona via protocolo MQTT para publicação dos dados do sistema 
+- Integração de variáveis externas (temperatura externa e carga térmica), simulando condições reais de um Data Center 
 
 ---
 
