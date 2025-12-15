@@ -39,14 +39,16 @@ O sistema integra lógica de controle, backend em Node.js e visualização em te
 1. Instalar as dependências:
 ```bash
 npm install
-Iniciar o sistema:
 
-bash
-Copiar código
+2. Iniciar o sistema:
+```bash
 npm start
-Abrir a interface:
 
+
+3. Abrir a interface:
 Acesse o arquivo public/index.html no navegador
+
+---
 
 👨‍💻 Autores
 Gabriel Lopes Silva – Lógica Fuzzy e inferência
