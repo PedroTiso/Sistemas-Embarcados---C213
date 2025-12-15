@@ -37,11 +37,9 @@ O sistema integra lógica de controle, backend em Node.js e visualização em te
 ## 🚀 Como Executar
 
 1. Instalar as dependências:
-```bash
 npm install
 
 2. Iniciar o sistema:
-```bash
 npm start
 
 
