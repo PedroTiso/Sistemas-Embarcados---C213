@@ -37,14 +37,13 @@ O sistema integra lógica de controle, backend em Node.js e visualização em te
 ## 🚀 Como Executar
 
 1. Instalar as dependências:
-npm install
+- npm install
 
 2. Iniciar o sistema:
-npm start
-
+- npm start
 
 3. Abrir a interface:
-Acesse o arquivo public/index.html no navegador
+- Acesse o arquivo public/index.html no navegador
 
 ---
 
